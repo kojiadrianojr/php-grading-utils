@@ -1,10 +1,11 @@
 require('events').EventEmitter.defaultMaxListeners = 0
+require('dotenv').config();
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path')
 
 const config = {
-    path: 'outputDir/' || process.env.PATH,
+    path: process.env.OUTPUT_DIR,
 }
 
 
@@ -22,10 +23,9 @@ const clearArchives = ({path}) => {
 
 
 const readdir = async() => {
-    const dirs = await fs.promises.readdir(config.path)
+    const dirs = await fs.readdirSync(config.path)
     return dirs.filter(x => !/\.zip$/.test(x)) 
 }
-
 
 
 (async () => {
@@ -35,7 +35,7 @@ const readdir = async() => {
         if (!dir) throw (err)
         const browser =  await puppeteer.launch();
         const page = await browser.newPage();
-        await page.goto(`${path.join(__dirname,'..',config.path,dir,'index.html')}`);
+        await page.goto(`${path.join(config.path,dir,'index.html')}`);
         await page.screenshot({path: `screenshots/${dir}.png`, fullPage: true});
         await browser.close();
     })

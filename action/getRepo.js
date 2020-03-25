@@ -8,22 +8,22 @@ const { Octokit } = require('@octokit/rest');
 // const { createTokenAuth } = require('@octokit/auth-token');
 // const auth = createTokenAuth(TOKEN);
 // const token = auth().then(res => res);
-const client = new Octokit({
+
+const client = TOKEN ? new Octokit({
     auth: TOKEN
-})
+}) : new Octokit();
 
 const config = {
     REPO: {
-        outputPath: 'outputDir/',
-        repo: 'https://github.com/boomcamp/html-css-final',
-        branch: 'submission',
-        archive_format: 'zipball'
+        outputPath: process.env.OUTPUT_DIR,
+        repo: process.env.REPOSITORY,
+        branch: process.env.BRANCH,
     },
     OPTIONS: {
         state: 'open',
         sort: 'created',
+        archive_format: 'zipball'
     }
-
 }
 
 //for downloading the repo
@@ -43,13 +43,13 @@ const download = async (outPath, data) => {
                         zipFile: file,
                         extractEntryTo: outPath,
                         outputDir: outPath,
+                        owner: config.owner
                     })
                 })
         } catch (err) {
             throw err;
         } finally {
             console.log(`${config.owner}'s repo has been downloaded.`);
-            
         }
     })
 }
@@ -65,6 +65,7 @@ const parse = url => {
 const extract = (config) => {
     var zip = new admzip(config.zipFile);
     zip.extractAllTo(config.outputDir, false)
+    console.log(`${config.owner}'s archive has been extracted. . .`);
 }
 
 //deleting archives
@@ -96,7 +97,7 @@ const extract = (config) => {
             return {
                 owner: pr.user.login,
                 repo: pr.head.repo.name,
-                archive_format: REPO.archive_format,
+                archive_format: OPTIONS.archive_format,
                 ref: REPO.branch
             }
         })
