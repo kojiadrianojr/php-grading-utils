@@ -29,13 +29,16 @@ const readdir = async() => {
 
 
 (async () => {
-    await clearArchives(config);
+    // await clearArchives(config);
     let directories = (await readdir() )  
     await directories.forEach(async dir => {
-        if (!dir) throw (err)
+        if (!dir) throw err;
+        let pathname = path.join(config.path, dir);
+        let folder = config.path.split('/').pop();
+        let url = `http://localhost/${folder}/${dir}/index.php`
         const browser =  await puppeteer.launch();
         const page = await browser.newPage();
-        await page.goto(`${path.join(config.path,dir,'index.html')}`);
+        await page.goto(url);
         await page.screenshot({path: `screenshots/${dir}.png`, fullPage: true});
         await browser.close();
     })
