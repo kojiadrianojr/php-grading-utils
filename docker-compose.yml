@@ -1,10 +1,13 @@
 version: "3"
 services: 
     grading:
-        build: .
+        env_file: 
+            - .env
+        build: ./
         ports: 
             - "80:80"
         volumes: 
+            - .:/php-grading-utils
             - ./outputDir:/var/www/html/
         networks:
             - default
